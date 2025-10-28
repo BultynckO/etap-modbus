@@ -22,13 +22,14 @@ class modbus_wrapper:
         try:
             result = self.client.write_registers(address=address, values=value, slave=self.slave_id)
             return not result.isError()
-        except:
+        except Exception as e:
+            # print("Error writing data: " + str(e))
             return False
     
     def read(self, address, count, data_type):
         res = self._read(address, count)
         if res is None:
-            print("Error reading data")
+            # print("Error reading data")
             return None
         data_type = str(data_type).upper()
         
@@ -71,11 +72,11 @@ class modbus_wrapper:
         if data_type == "INT16":
             if value < -32768 or value > 32767 or type(value) is not int:
                 raise ValueError("Cannot write {0} as INT16".format(value))
-            data_to_write = struct.unpack('>H', struct.pack('>h', value))[0]
+            data_to_write = list(struct.unpack('>H', struct.pack('>h', value))[0])
         elif data_type == "UINT16":
             if value < 0 or value > 65535 or type(value) is not int:
                 raise ValueError("Cannot write {0} as UINT16".format(value))
-            data_to_write = struct.unpack('>H', struct.pack('>H', value))[0]
+            data_to_write = list(struct.unpack('>H', struct.pack('>H', value)))
         elif data_type == "UINT32":
             if value < 0 or value > 4294967295 or type(value) is not int:
                 raise ValueError("Cannot write {0} as UINT32".format(value))
